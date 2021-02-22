@@ -1,10 +1,4 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-# флейворы
+# флейворы + 
 # нампай +
 # ффд +
 
@@ -111,6 +105,14 @@ class PM:
 
             self.vms = list()
 
+    def check_vm(self, vm):
+        ok = True
+        for tr in self.traits:
+            if self.demand[tr] + vm.traits[tr] * vm.load[tr] > self.max_load[tr] * self.traits[tr]:
+                ok = False
+                break
+        return ok
+
     def place_vm(self, vm, idx=-1):
         self.vms.append((vm, idx))
         for tr in vm.traits:
@@ -142,7 +144,7 @@ def RoundRobin(pms, vms, placement):
     for i in range(len(vms)):
         temp = idx
         while True:
-            if vms[i].check_pm(pms[idx]):
+            if pms[idx].check_vm(vms[i]):
                 placement[idx][i] = 1
                 pms[idx].place_vm(vms[i], i)
                 break
@@ -163,7 +165,7 @@ def FFD(pms, vms, placement, trait="ram"):
 
     for i in range(len(vms)):
         for j in range(len(pms)):
-            if vms[i].check_pm(pms[j]):
+            if pms[j].check_vm(vms[i]):
                 pms[j].place_vm(vms[i])
 
                 if placement[j][i] != 1:
@@ -254,5 +256,3 @@ if __name__ == '__main__':
     overloaded = CountOverloaded(pms)
     print("Overloaded:", overloaded)
     print("\n\n")
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
