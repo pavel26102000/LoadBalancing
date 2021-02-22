@@ -1,4 +1,4 @@
-# флейворы + 
+# флейворы +
 # нампай +
 # ффд +
 
@@ -72,14 +72,6 @@ class VM:
 
         for tr, [loc, sc] in self.load_dis.items():
             self.load[tr] = gen_load(loc, sc)
-
-    def check_pm(self, pm):
-        ok = True
-        for tr in self.traits:
-            if pm.demand[tr] + self.traits[tr] * self.load[tr] > pm.max_load[tr] * pm.traits[tr]:
-                ok = False
-                break
-        return ok
 
 
 class PM:
@@ -256,3 +248,5 @@ if __name__ == '__main__':
     overloaded = CountOverloaded(pms)
     print("Overloaded:", overloaded)
     print("\n\n")
+
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
