@@ -14,3 +14,5 @@ def RebalanceLoads(pms, vms):
         for j in range(len(pms[i].vms)):
             _, idx = pms[i].vms[j]
             pms[i].update_vm(vms[idx], j)
+
+    return pms, vms
