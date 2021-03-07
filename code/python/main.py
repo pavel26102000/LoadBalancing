@@ -15,7 +15,7 @@ if __name__ == '__main__':
         pms.append(PM())
 
     vms = list()
-    for i in range(300):
+    for i in range(500):
         flavour = np.random.randint(1, 4)
         vms.append(VM(flavour=flavour))
 
@@ -38,9 +38,9 @@ if __name__ == '__main__':
     print("Overloaded:", overloaded)
     print("Std usage:", std_usage)
     print("Number of free hosts:", free)
-    print("----------------------")
+    print("----------------------")      
 
-    table, n_m = FFD(pms, vms, table)
+    table, n_m = FFD(pms, vms, table, lambda x: -x.traits["ram"] * x.load["ram"])
     free = CountFreePMS(table)
     print("After balancing:")  # second mapping stats
     print("Number of free hosts:", free)
@@ -50,3 +50,4 @@ if __name__ == '__main__':
     overloaded = CountOverloaded(pms)
     print("Overloaded:", overloaded)
     print("\n\n")
+
