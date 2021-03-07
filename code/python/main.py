@@ -11,11 +11,11 @@ from Commons import RebalanceLoads
 
 if __name__ == '__main__':
     pms = list()
-    for i in range(60):
+    for i in range(120):
         pms.append(PM())
 
     vms = list()
-    for i in range(500):
+    for i in range(1000):
         flavour = np.random.randint(1, 4)
         vms.append(VM(flavour=flavour))
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     print("\n")
 
     std_usage = CountStdResourceUsage(pms)
-    RebalanceLoads(pms, vms)  # rebalancing loads
+    pms, vms = RebalanceLoads(pms, vms)  # rebalancing loads
 
     overloaded = CountOverloaded(pms)  # first mapping stats
     print("Before balancing:")
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     print("Number of free hosts:", free)
     print("----------------------")      
 
-    table, n_m = FFD(pms, vms, table, lambda x: -x.traits["ram"] * x.load["ram"])
+    table, n_m = HottestToColdest(pms, vms, table, lambda x: -x.traits["ram"] * x.load["ram"])
     free = CountFreePMS(table)
     print("After balancing:")  # second mapping stats
     print("Number of free hosts:", free)

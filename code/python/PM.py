@@ -1,3 +1,5 @@
+import copy
+
 class PM:
     def __init__(self, flavour=None):
         if flavour is None:
@@ -29,10 +31,19 @@ class PM:
                 break
         return ok
 
-    def place_vm(self, vm, idx=-1):
-        self.vms.append((vm, idx))
+    def place_vm(self, vm, idx):
+        self.vms.append((copy.deepcopy(vm), idx))
         for tr in vm.traits:
             self.demand[tr] += vm.traits[tr] * vm.load[tr]
+
+    def remove_vm(self, idx):
+        i = 0
+        while self.vms[i][1] != idx:
+            i += 1
+        vm, _ = self.vms.pop(i)
+
+        for tr in self.traits:
+            self.demand[tr] -= vm.traits[tr] * vm.load[tr]
 
     def update_vm(self, vm, idx):
         curr_vm, ar_idx = self.vms[idx]
@@ -53,3 +64,10 @@ class PM:
         for tr in self.traits:
             self.demand[tr] = 0
         self.vms = list()
+
+    def is_overloaded(self):
+        for tr in self.traits:
+            if self.traits[tr] * self.max_load[tr] < self.demand[tr]:
+                return True
+
+        return False
