@@ -1,24 +1,28 @@
 import numpy as np
 
-def FFD(pms, vms, placement, trait="ram"):
+
+def FFD(pms, vms, placement, sort_key=lambda x: -x.traits["ram"] * x.load["ram"]):
     for pm in pms:
         pm.clear()
-    vms.sort(key=lambda x: -x.traits[trait] * x.load[trait])
+    sorted_vms = list(enumerate(vms))
+    sorted_vms.sort(key=lambda x: sort_key(x[1]))
     num_migrations = 0
 
-    for i in range(len(vms)):
+    for i in range(len(sorted_vms)):
+        vm_idx = sorted_vms[i][0]
         for j in range(len(pms)):
-            if pms[j].check_vm(vms[i]):
-                pms[j].place_vm(vms[i])
+            if pms[j].check_vm(vms[vm_idx]):
+                pms[j].place_vm(vms[vm_idx])
 
-                if placement[j][i] != 1:
+                if placement[j][vm_idx] != 1:
                     num_migrations += 1
                     for t in range(len(placement)):
-                        placement[t][i] = 0
-                    placement[j][i] = 1
+                        placement[t][vm_idx] = 0
+                    placement[j][vm_idx] = 1
                 break
 
     return placement, num_migrations
+
 
 def RoundRobin(pms, vms, placement):
     idx = np.random.randint(0, len(pms) - 1)
