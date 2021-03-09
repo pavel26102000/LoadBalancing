@@ -1,4 +1,5 @@
 import copy
+from VM import VM
 
 class PM:
     def __init__(self, flavour=None):
@@ -23,7 +24,7 @@ class PM:
 
             self.vms = list()
 
-    def check_vm(self, vm):
+    def check_vm(self, vm: VM):
         ok = True
         for tr in self.traits:
             if self.demand[tr] + vm.traits[tr] * vm.load[tr] > self.max_load[tr] * self.traits[tr]:
@@ -31,12 +32,12 @@ class PM:
                 break
         return ok
 
-    def place_vm(self, vm, idx):
+    def place_vm(self, vm: VM, idx: int):
         self.vms.append((copy.deepcopy(vm), idx))
         for tr in vm.traits:
             self.demand[tr] += vm.traits[tr] * vm.load[tr]
 
-    def remove_vm(self, idx):
+    def remove_vm(self, idx: int):
         i = 0
         while self.vms[i][1] != idx:
             i += 1
@@ -45,7 +46,7 @@ class PM:
         for tr in self.traits:
             self.demand[tr] -= vm.traits[tr] * vm.load[tr]
 
-    def update_vm(self, vm, idx):
+    def update_vm(self, vm: VM, idx: int):
         curr_vm, ar_idx = self.vms[idx]
         for tr in vm.traits:
             self.demand[tr] -= curr_vm.traits[tr] * curr_vm.load[tr]

@@ -61,3 +61,9 @@ class VM:
 
         for tr, [loc, sc] in self.load_dis.items():
             self.load[tr] = gen_load(loc, sc)
+
+    def mean_demand(self):
+        demand = 0
+        for tr in self.traits:
+            demand += self.traits[tr] * self.load[tr]
+        return demand / len(self.traits)
