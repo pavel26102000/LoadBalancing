@@ -63,15 +63,19 @@ def TEST(num_pms: int, num_vms: int, first_algo, second_algo, num_runs: int = 1)
     print("Average std usage after the Round Robin", avg_use_rr)
 
     print("\n----------------------------------------\n")
-    print("First algorithm and Rebalancing happened")
+    print("First algorithm happened")
     print("\n----------------------------------------\n")
 
-    print("Average number of overloaded hosts: ", avg_ovl_fst)
     print("Average std usage after First Algorithm: ", avg_usage_fst)
     print("Average free hosts after First Algorithm: ", avg_free_hosts_first_algo)
 
     print("\n----------------------------------------\n")
     print("Rebalancing happened")
+    print("\n----------------------------------------\n")
+    print("Average number of overloaded hosts: ", avg_ovl_fst)
+
+    print("\n----------------------------------------\n")
+    print("Second Algorithm happened")
     print("\n----------------------------------------\n")
 
     print("Average number of overloaded hosts: ", avg_ovl_snd)
@@ -82,10 +86,4 @@ def TEST(num_pms: int, num_vms: int, first_algo, second_algo, num_runs: int = 1)
 
 
 if __name__ == '__main__':
-    # test function args:
-    # num_pms : number of servers
-    # num_vms : number of Virtual Machines to Place
-    # first_algo : the algorithm to make initial mapping
-    # second_algo : the algorithm to rebalance load
-    # num_runs : number of times to run rebalancing algorithm (from scratch)
-    TEST(100, 500, FFD, MyAlgorithm, 100)
+    TEST(100, 500, FFD, MyAlgorithm, 10)
