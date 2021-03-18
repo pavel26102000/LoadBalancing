@@ -69,6 +69,7 @@ def RoundRobin(pms, vms, placement):
     return placement, vms
 
 
+# this algorithm is designed only to get rid of overloaded hosts using the least possible amount of migrations
 def HottestToColdest(pms, vms, placement, sort_vm_key=lambda x: x.traits["ram"] * x.load["ram"],
                      sort_pm_key=lambda x: x.mean_load() + x.is_overloaded()):
     pms_heap = Heap(pms, sort_pm_key)
@@ -110,9 +111,9 @@ def HottestToColdest(pms, vms, placement, sort_vm_key=lambda x: x.traits["ram"] 
 
 
 def MyAlgorithm(pms, vms, placement, sort_vm_key=lambda x: x.mean_demand(),
-                sort_pm_key=lambda x: x.mean_load() + x.is_overloaded(), max_migrations_to_free=2):
+                sort_pm_key=lambda x: x.mean_load() + x.is_overloaded(), max_migrations_to_free=5):
     have_to_migrate = Heap(key=sort_vm_key)
-    dirty = [False] * len(pms)
+    low_load = [False] * len(pms)
     num_migrations = 0
 
     for i in range(len(pms)):
@@ -123,9 +124,9 @@ def MyAlgorithm(pms, vms, placement, sort_vm_key=lambda x: x.mean_demand(),
                 pms[i].remove_vm(vm_idx)
                 have_to_migrate.push(vm, vm_idx)
         elif len(pms[i].vms) <= max_migrations_to_free:
-            dirty[i] = True
+            low_load[i] = True
 
-    sorted_pms = sorted(enumerate(pms), key=lambda x: sort_pm_key(x[1]) + 4 * (len(x[1].vms) == 0) + 2 * dirty[x[0]])
+    sorted_pms = sorted(enumerate(pms), key=lambda x: (len(x[1].vms) == 0, low_load[x[0]], sort_pm_key(x[1])))
 
     while not have_to_migrate.empty():
         vm_idx, vm = have_to_migrate.pop()
@@ -138,35 +139,44 @@ def MyAlgorithm(pms, vms, placement, sort_vm_key=lambda x: x.mean_demand(),
                     placement[t][vm_idx] = 0
                 placement[pm_idx][vm_idx] = 1
                 num_migrations += 1
-                dirty[pm_idx] = False
+                low_load[pm_idx] = False
                 break
 
-    sorted_pms = sorted(enumerate(pms), key=lambda x: sort_pm_key(x[1]) + 4 * (len(x[1].vms) == 0) + 2 * dirty[x[0]])
+    sorted_pms = sorted(enumerate(pms), key=lambda x: (len(x[1].vms) == 0, low_load[x[0]], sort_pm_key(x[1])))
 
-    for i in range(len(dirty)):
-        if dirty[i]:
+    for i in range(len(low_load)):
+        if low_load[i]:
             new_pm_idxes = []
             can_be_placed = True
             for vm, vm_idx in pms[i].vms:
                 if can_be_placed:
-                    for i in range(len(sorted_pms)):
-                        pm_idx = sorted_pms[i][0]
-                        if dirty[pm_idx]:
-                            can_be_placed = False
-                            break
-                        if pms[pm_idx].check_vm(vm):
-                            pms[pm_idx].place_vm(vm, vm_idx)
-                            new_pm_idxes.append((pm_idx, vm_idx))
-                            dirty[pm_idx] = False
-                            break
+                    for j in range(len(sorted_pms)):
+                        pm_idx = sorted_pms[j][0]
+                        if pm_idx != i:
+                            if len(pms[pm_idx].vms) == 0:
+                                can_be_placed = False
+                                break
+                            if pms[pm_idx].check_vm(vm):
+                                pms[pm_idx].place_vm(vm, vm_idx)
+                                new_pm_idxes.append((pm_idx, vm_idx))
+                                low_load[pm_idx] = False
+                                break
             if can_be_placed:
                 pms[i].clear()
+
+                # deleting free pm from the list of possible targets for further migration
+                sorted_idx = None
+                for j in range(len(sorted_pms)):
+                    if sorted_pms[j][0] == i:
+                        sorted_idx = j
+                        break
+                sorted_pms.pop(sorted_idx)
 
                 for pm_idx, vm_idx in new_pm_idxes:
                     for t in range(len(pms)):
                         placement[t][vm_idx] = 0
                     placement[pm_idx][vm_idx] = 1
-                num_migrations += 1
+                    num_migrations += 1
             else:
                 for pm_idx, vm_idx in new_pm_idxes:
                     pms[pm_idx].remove_vm(vm_idx)

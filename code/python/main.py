@@ -62,27 +62,26 @@ def TEST(num_pms: int, num_vms: int, first_algo, second_algo, num_runs: int = 1)
     print("Average total number of vms: ", avg_num_vms_total)
     print("Average std usage after the Round Robin", avg_use_rr)
 
-    print("\n----------------------------------------\n")
+    print("\n----------------------------------------")
     print("First algorithm happened")
-    print("\n----------------------------------------\n")
+    print("----------------------------------------\n")
 
     print("Average std usage after First Algorithm: ", avg_usage_fst)
     print("Average free hosts after First Algorithm: ", avg_free_hosts_first_algo)
 
-    print("\n----------------------------------------\n")
+    print("\n----------------------------------------")
     print("Rebalancing happened")
-    print("\n----------------------------------------\n")
+    print("----------------------------------------\n")
     print("Average number of overloaded hosts: ", avg_ovl_fst)
 
-    print("\n----------------------------------------\n")
+    print("\n----------------------------------------")
     print("Second Algorithm happened")
-    print("\n----------------------------------------\n")
+    print("----------------------------------------\n")
 
     print("Average number of overloaded hosts: ", avg_ovl_snd)
     print("Average std usage after Second Algorithm: ", avg_usage_snd)
     print("Average free hosts difference after Second Algorithm: ", avg_free_hosts_diff)
     print("Average number of migrations: ", avg_num_migrations)
-
 
 
 if __name__ == '__main__':
